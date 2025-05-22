@@ -1,6 +1,15 @@
 
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+
+
 
 class Student {
     String name;
@@ -11,9 +20,37 @@ class Student {
         this.name = name;
         this.score = score;
         this.grade = 10;
+
+    }
+
+}
+class Database {
+
+    private static final String url = "jdbc:postgresql://localhost:5432/students";
+    private static final String user = "postgres";
+    private static final String password = "Letsdoit!";
+
+    public static void initDB() {
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             Statement stmt = conn.createStatement()) {
+
+            String createDB = """
+                CREATE TABLE IF NOT EXISTS students (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(50),
+                    score INT,
+                    grade INT
+                );
+            """;
+
+            stmt.executeUpdate(createDB);
+            System.out.println("Table created or already exists.");
+
+        } catch (SQLException e) {
+            System.out.println("Database initialization failed: " + e.getMessage());
+        }
     }
 }
-
 public class Main {
     public static void main(String[] args) {
         ArrayList<Student> students = new ArrayList<>();
@@ -164,6 +201,7 @@ public class Main {
         if (students.isEmpty()) {
             System.out.println("No students to delete.");
             return;
+
         }
 
         while (true) {
